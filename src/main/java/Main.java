@@ -43,7 +43,7 @@ public class Main {
         GsonBuilder builder = new GsonBuilder();
         builder.setPrettyPrinting();
         Gson gson = builder.create();
-        String json = gson.toJson(staff, listType); // TODO вместо вывода, надо сделать сохранение в файл
+        String json = gson.toJson(staff, listType);
         writeString(json);
     }
 
