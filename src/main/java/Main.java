@@ -26,7 +26,9 @@ public class Main {
         List<Employee> list = parseCSV(columnMapping, fileName);
         listToJson(list);
 
-        List<Employee> list2 = parseXML("data.xml");
+        String fileName2 = "data.xml";
+        List<Employee> list2 = parseXML(fileName2);
+        listToJson(list2);
     }
 
     public static List<Employee> parseCSV(String[] columnMapping, String fileName){
@@ -46,29 +48,61 @@ public class Main {
     }
 
     public static List<Employee> parseXML (String fileName) throws IOException, SAXException, ParserConfigurationException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(new File(fileName));
+        List<Employee> staff = new ArrayList<>();
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document doc = db.parse(new File(fileName));
+        doc.getDocumentElement().normalize();
+        System.out.println("Root element " + doc.getDocumentElement().getNodeName());
+        NodeList nodeLst = doc.getElementsByTagName("employee");
+        System.out.println("Information of all employees");
 
-        Node root = doc.getDocumentElement();
-        NodeList nodeListChildRoot = root.getChildNodes();
-        List<String> employeeValues = new ArrayList<>();
-        Employee employee = new Employee(Long.parseLong(employeeValues.get(0)), employeeValues.get(1), employeeValues.get(3), employeeValues.get(4), Integer.parseInt(employeeValues.get(5)));
-        System.out.println(employee);
-        for (int i = 0; i < nodeListChildRoot.getLength(); i++) {
-            Node node_ = nodeListChildRoot.item(i);
-            if (Node.ELEMENT_NODE == node_.getNodeType()){
-                Element element = (Element) node_;
-                NamedNodeMap map = element.getAttributes();
-                for (int a = 0; a < map.getLength(); a++) {
-                    String attrName = map.item(a).getNodeName();
-                    String attrValue = map.item(a).getNodeValue();
-                    employeeValues.add(attrValue);
-                }
-                }
-                // TODO не доделано, не считывает документ
+        for (int s = 0; s < nodeLst.getLength(); s++) {
+            Node fstNode = nodeLst.item(s);
+            if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                Element fstElmnt = (Element) fstNode;
+                NodeList fstNmElmntLst = fstElmnt.getElementsByTagName("id");
+                Element fstNmElmnt = (Element) fstNmElmntLst.item(0);
+                NodeList fstNm = fstNmElmnt.getChildNodes();
+                String ID = ((Node) fstNm.item(0)).getNodeValue();
+                System.out.println("id : " + ID);
+
+                //
+
+                NodeList lstNmElmntLst2 = fstElmnt.getElementsByTagName("firstName");
+                Element lstNmElmnt2 = (Element) lstNmElmntLst2.item(0);
+                NodeList lstNm2 = lstNmElmnt2.getChildNodes();
+                String FirstName = ((Node) lstNm2.item(0)).getNodeValue();
+                System.out.println("firstName : " + FirstName);
+                //
+
+                NodeList lstNmElmntLst3 = fstElmnt.getElementsByTagName("lastName");
+                Element lstNmElmnt3 = (Element) lstNmElmntLst3.item(0);
+                NodeList lstNm3 = lstNmElmnt3.getChildNodes();
+                String LastName = ((Node) lstNm3.item(0)).getNodeValue();
+                System.out.println("lastName : " + LastName);
+                //
+
+                NodeList lstNmElmntLst4 = fstElmnt.getElementsByTagName("country");
+                Element lstNmElmnt4 = (Element) lstNmElmntLst4.item(0);
+                NodeList lstNm4 = lstNmElmnt4.getChildNodes();
+                String Country = ((Node) lstNm4.item(0)).getNodeValue();
+                System.out.println("country : " + Country);
+                //
+
+                NodeList lstNmElmntLst5 = fstElmnt.getElementsByTagName("age");
+                Element lstNmElmnt5 = (Element) lstNmElmntLst5.item(0);
+                NodeList lstNm5 = lstNmElmnt5.getChildNodes();
+                String Age = ((Node) lstNm5.item(0)).getNodeValue();
+                System.out.println("age : " + Age);
+
+                Employee employee = new Employee(Long.parseLong(ID), FirstName, LastName, Country, Integer.parseInt(Age));
+                staff.add(employee);
+
             }
-        return null;
+        }
+        return staff;
     }
 
     public static void listToJson(List<Employee> staff){
@@ -81,7 +115,7 @@ public class Main {
     }
 
     public static void writeString(String json){
-        try (FileWriter file = new FileWriter("new_json.json")){
+        try (FileWriter file = new FileWriter("data2.json")){
             file.write(json);
             file.flush();
         } catch (IOException e){
